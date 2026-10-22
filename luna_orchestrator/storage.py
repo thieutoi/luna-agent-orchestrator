@@ -11,12 +11,19 @@ class SQLiteStore:
         if self.path == ":memory:":
             raise ValueError("Use a file-backed SQLite database")
         with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
             version = db.execute("PRAGMA user_version").fetchone()[0]
-            if version not in (0, 1):
+            if version not in (0, 1, 2):
                 raise ValueError("Unsupported database schema")
             db.execute("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, data TEXT NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS audit (seq INTEGER PRIMARY KEY, event TEXT NOT NULL)")
-            db.execute("PRAGMA user_version = 1")
+            if version < 2:
+                for task_id, encoded in db.execute("SELECT id, data FROM tasks").fetchall():
+                    data = json.loads(encoded)
+                    data.setdefault("timeout_seconds", None)
+                    db.execute("UPDATE tasks SET data=? WHERE id=?",
+                               (json.dumps(data, sort_keys=True), task_id))
+            db.execute("PRAGMA user_version = 2")
 
     def connect(self):
         return sqlite3.connect(self.path, timeout=10)

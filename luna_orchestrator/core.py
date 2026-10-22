@@ -2,11 +2,14 @@
 
 from dataclasses import asdict, dataclass, replace
 from enum import Enum
+import math
+import time
 from threading import RLock
 from typing import Callable, Dict, List
 from uuid import uuid4
 
 from .storage import SQLiteStore
+from .execution import IsolationError, run_isolated
 
 
 class TaskStatus(str, Enum):
@@ -16,6 +19,7 @@ class TaskStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     REJECTED = "rejected"
+    TIMED_OUT = "timed_out"
 
 
 @dataclass
@@ -28,6 +32,7 @@ class Task:
     result: str = ""
     max_retries: int = 0
     attempts: int = 0
+    timeout_seconds: float | None = None
 
 
 class Orchestrator:
@@ -55,6 +60,8 @@ class Orchestrator:
 
     def _save(self, task, event, previous=None):
         full_event = f"{task.id}:{event}"
+        if previous is not None and asdict(self.tasks[task.id]) != previous:
+            raise ValueError("Task changed while execution was in progress")
         if self._store:
             self._store.save(asdict(task), previous, full_event)
         if task.id in self.tasks:
@@ -71,16 +78,21 @@ class Orchestrator:
             self.workers[name] = handler
 
     def submit(self, worker: str, payload: str, *, sensitive: bool = False,
-               max_retries: int = 0) -> Task:
+               max_retries: int = 0, timeout_seconds: float | None = None) -> Task:
         if type(max_retries) is not int or not 0 <= max_retries <= 10:
             raise ValueError("max_retries must be an integer between 0 and 10")
+        if timeout_seconds is not None:
+            if (type(timeout_seconds) not in (int, float)
+                    or not 0 < timeout_seconds <= 86400 or not math.isfinite(timeout_seconds)):
+                raise ValueError("timeout_seconds must be in (0, 86400], or None")
+            timeout_seconds = float(timeout_seconds)
         with self._state_lock:
             if worker not in self.workers:
                 raise ValueError("Unknown worker")
             task = Task(
                 id=str(uuid4()), worker=worker, payload=payload, sensitive=sensitive,
                 status=TaskStatus.AWAITING_APPROVAL if sensitive else TaskStatus.PENDING,
-                max_retries=max_retries,
+                max_retries=max_retries, timeout_seconds=timeout_seconds,
             )
             return self._save(task, "submitted")
 
@@ -111,10 +123,27 @@ class Orchestrator:
             task = self._save(replace(task, status=TaskStatus.RUNNING, attempts=task.attempts + 1),
                               "started", asdict(task))
             payload = task.payload
+            # Own an immutable snapshot: refresh() may mutate the public Task.
+            owned = replace(task)
+            deadline = (time.monotonic() + task.timeout_seconds
+                        if task.timeout_seconds is not None else None)
         while True:
             try:
-                result = str(handler(payload))
-                status = TaskStatus.COMPLETED
+                if deadline is not None:
+                    try:
+                        state, result = run_isolated(handler, payload, deadline)
+                    except Exception:
+                        # Supervision/cleanup errors cannot prove worker death.
+                        # Never treat them as retryable handler exceptions.
+                        raise IsolationError(
+                            "Isolated supervision failed; task remains running"
+                        ) from None
+                    status = TaskStatus(state)
+                else:
+                    result = str(handler(payload))
+                    status = TaskStatus.COMPLETED
+            except IsolationError:
+                raise
             except Exception as exc:
                 try:
                     result = f"{type(exc).__name__}: {exc}"
@@ -122,12 +151,15 @@ class Orchestrator:
                     result = type(exc).__name__
                 status = TaskStatus.FAILED
             with self._state_lock:
-                previous = asdict(task)
-                if status == TaskStatus.FAILED and task.attempts <= task.max_retries:
-                    task = self._save(replace(task, attempts=task.attempts + 1, result=result),
+                previous = asdict(owned)
+                if deadline is not None and time.monotonic() >= deadline:
+                    status, result = TaskStatus.TIMED_OUT, "Task execution deadline exceeded"
+                if status == TaskStatus.FAILED and owned.attempts <= owned.max_retries:
+                    task = self._save(replace(owned, attempts=owned.attempts + 1, result=result),
                                       "retrying", previous)
+                    owned = replace(task)
                     continue
-                return self._save(replace(task, status=status, result=result),
+                return self._save(replace(owned, status=status, result=result),
                                   status.value, previous)
 
     def recover_interrupted(self):

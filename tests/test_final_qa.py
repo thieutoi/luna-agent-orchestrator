@@ -31,8 +31,8 @@ class FinalQATests(unittest.TestCase):
         self.assertEqual(opened.call_args.kwargs["timeout"], 40)
         self.assertNotIn("TEST", str(ctx.exception))
 
-    def test_handler_has_no_execution_deadline_and_stays_claimed(self):
-        # This characterizes the missing timeout; it does NOT certify a timeout.
+    def test_legacy_inline_handler_without_timeout_stays_claimed(self):
+        # Legacy inline mode is explicitly selected by timeout_seconds=None.
         entered, release = threading.Event(), threading.Event()
         o, errors = Orchestrator(), []
         def handler(_):

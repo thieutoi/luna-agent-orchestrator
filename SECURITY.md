@@ -38,3 +38,19 @@ database edits. Recovery must run only with all executors stopped. Retries can
 repeat side effects; opt in only for handlers whose operations are idempotent.
 Directly mutating public Task/dictionary objects is unsupported and can bypass
 in-process controls. Use orchestrator APIs for transitions.
+
+
+## Deadline-mode isolation
+
+A configured task deadline uses a spawned process which the supervisor terminates
+and, if necessary, kills. This is process lifecycle isolation, not a security
+sandbox: the child inherits the account's filesystem/network access and environment.
+Use only trusted importable handlers. Do not execute untrusted pickles, malicious
+code or handlers that launch their own child processes.
+
+Forced termination skips handler finally blocks and cannot reverse external side
+effects. Timeout never retries automatically. If process death is uncertain, state
+remains running and cannot be replayed. After supervisor failure, stop all surviving
+workers before maintenance recovery; startup deliberately does not replay tasks.
+Temporary JSON result files live in a private OS temporary directory and are removed
+after worker exit; task payloads/results must still exclude secrets.
