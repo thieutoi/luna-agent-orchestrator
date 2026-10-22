@@ -71,21 +71,20 @@ Không truy cập, sao chép hay sử dụng repository riêng tư bị loại t
 
 ## GitHub / Pull Request
 
-Chưa push và chưa tạo PR. GitHub CLI (gh) không có trên PATH; chưa xác minh quyền
-ghi GitHub. Thay đổi được lưu và stage cục bộ trên đúng nhánh, không sửa main, merge hay release.
-Chưa tạo commit: Git thiếu user.name và user.email; không tự gán danh tính tác giả.
+Đã cấu hình danh tính Git cục bộ theo thông tin chủ sở hữu cung cấp.
+Đã rà soát toàn bộ staged diff, không phát hiện credential hay dữ liệu cá nhân
+trong nội dung file. Git commit có metadata tác giả theo danh tính được cung cấp.
 
-Từ thư mục repository, sau khi cấu hình xác thực GitHub, có thể chạy:
+Chạy lại compileall: thành công. Suite 15 test: 15 PASS, 0 FAIL/ERROR/SKIP.
+Demo: awaiting_approval -> HELLO LUNA -> completed.
+Lần chạy lại này bổ sung 15 lượt test vào 34 lượt đã ghi ở phần kiểm thử ban đầu.
 
-    git config user.name "TEN_GITHUB_CUA_BAN"
-    git config user.email "EMAIL_NOREPLY_GITHUB_CUA_BAN"
-    git commit -m "fix: prevent duplicate task execution and add validation"
-    git push -u origin test/initial-validation
-
-Sau đó mở:
-https://github.com/thieutoi/luna-agent-orchestrator/compare/main...test/initial-validation
-Nếu không có quyền push, fork repository rồi push nhánh sang fork và tạo PR về main.
-Kiểm tra diff trước khi gửi; không đưa đường dẫn hoặc bí mật cá nhân vào PR.
+Commit mã đã kiểm thử: c41f96fc0f60af4929d5f7d78bec9f7e7b02767e.
+Đã push nhánh test/initial-validation bằng Git HTTPS / Git Credential Manager.
+Pull Request vào main: https://github.com/thieutoi/luna-agent-orchestrator/pull/1
+PR đã tạo, chưa merge. Không force push, không tạo release, không sửa main.
+GitHub CLI không được cài thêm; PR được tạo qua GitHub connector.
+Bản cập nhật báo cáo này được lưu bằng commit tài liệu riêng.
 
 ## Ưu tiên v0.2.0 (chỉ đề xuất)
 
