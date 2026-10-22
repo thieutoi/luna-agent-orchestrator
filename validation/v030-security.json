@@ -1,0 +1,5 @@
+{
+  "scope": "tracked and nonignored working-tree files; no environment values or private repositories",
+  "files_scanned": 51,
+  "findings": []
+}

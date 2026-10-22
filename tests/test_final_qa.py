@@ -16,6 +16,7 @@ class FinalQATests(unittest.TestCase):
     def test_telegram_mismatched_chat_does_not_read_or_approve(self):
         o = Mock()
         adapter = TelegramAdapter(o, [123], Mock())
+        o.reset_mock()  # Constructor restores the cursor; auth must not read tasks.
         update = {"message": {
             "from": {"id": 123, "is_bot": False},
             "chat": {"id": 456, "type": "private"}, "text": "/approve task",

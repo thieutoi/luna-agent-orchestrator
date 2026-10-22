@@ -1,0 +1,5 @@
+{
+  "allowed_user_ids": [123456789],
+  "db_path": "luna.sqlite3",
+  "rate_limit": 20
+}

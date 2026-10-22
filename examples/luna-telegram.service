@@ -1,0 +1,20 @@
+# Manual template; adjust paths/account. Not installed by the wizard.
+[Unit]
+Description=Luna Telegram control adapter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=luna
+WorkingDirectory=/opt/luna
+EnvironmentFile=/etc/luna/token.env
+ExecStart=/opt/luna/.venv/bin/luna telegram --config /etc/luna/luna-config.json
+Restart=on-failure
+RestartSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

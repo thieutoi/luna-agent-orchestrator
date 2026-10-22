@@ -30,8 +30,8 @@ then checks numeric sender ID and private-chat identity before reading task data
 Do not pass untrusted JSON to handle_update as if it were an authenticated webhook.
 Keep tokens in the local environment. Network exception text and Telegram API error
 descriptions are not exposed in CLI errors, since request URLs contain the token.
-All allowlisted users can approve/reject any awaiting task. Decisions currently
-record the action but not the Telegram actor ID.
+All allowlisted users can approve/reject any awaiting task. Telegram decisions
+record their numeric actor ID in the same atomic audit event.
 
 SQLite conditional writes protect normal concurrent execution, not malicious
 database edits. Recovery must run only with all executors stopped. Retries can
@@ -54,3 +54,27 @@ remains running and cannot be replayed. After supervisor failure, stop all survi
 workers before maintenance recovery; startup deliberately does not replay tasks.
 Temporary JSON result files live in a private OS temporary directory and are removed
 after worker exit; task payloads/results must still exclude secrets.
+
+
+## v0.3.0 configuration and polling
+
+The wizard stores only user IDs, database path and command limit. It refuses to
+overwrite files. Tokens are environment-only; ignored local luna-config.json must
+not be committed or attached to issues. New POSIX config/database files use mode 0600; existing DB permissions are preserved; Windows
+inherits directory ACLs, which the owner must restrict. Protect SQLite, service
+environment files and plaintext backups as well.
+
+Polling verifies numeric sender ID, non-bot status and matching private-chat identity
+before reading task state. Rate limits are per authorized user/process, reset on
+restart, and are not distributed abuse protection. Excess commands receive no reply.
+All allowed users share management authority; no per-task tenancy is provided.
+
+Decisions, checkpoints and reply delivery are not one transaction. State guards
+reject repeated decisions. Checkpoint-before-reply can lose a reply on network
+failure: reconcile with task states/audit instead of assuming the decision failed.
+Commands with an old Telegram date cannot approve or reject current work.
+
+Never expose configs, raw HTTP exceptions or environment dumps in issue reports.
+Reconnect logs contain only generic messages/delays. Auth/conflict errors stop the
+adapter. Unattended service managers must use restart delays and operator inspection.
+The example service is not installed or started automatically.
