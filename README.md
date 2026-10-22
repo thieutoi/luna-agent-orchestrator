@@ -34,3 +34,10 @@ Do not commit tokens, credentials, personal data, or production workflow secrets
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Execution state
+
+A task is marked `running` before its handler is called. Concurrent or nested
+execution of the same running task is rejected, as is execution of completed or
+failed tasks. This is an in-process guard; it does not provide persistence or
+cross-process coordination.

@@ -1,0 +1,9 @@
+test_failure_recorded (test_core.OrchestratorTests.test_failure_recorded) ... ok
+test_normal_task (test_core.OrchestratorTests.test_normal_task) ... ok
+test_sensitive_task_needs_approval (test_core.OrchestratorTests.test_sensitive_task_needs_approval) ... ok
+test_unknown_worker (test_core.OrchestratorTests.test_unknown_worker) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
