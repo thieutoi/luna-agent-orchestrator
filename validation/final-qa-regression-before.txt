@@ -1,0 +1,39 @@
+test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) ... 
+  test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[1, True]) ... FAIL
+  test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[1, 1.0]) ... FAIL
+  test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[123, 123.0]) ... FAIL
+test_handler_has_no_execution_deadline_and_stays_claimed (test_final_qa.FinalQATests.test_handler_has_no_execution_deadline_and_stays_claimed) ... ok
+test_network_timeout_is_sanitized_and_http_timeout_is_set (test_final_qa.FinalQATests.test_network_timeout_is_sanitized_and_http_timeout_is_set) ... ok
+test_telegram_mismatched_chat_does_not_read_or_approve (test_final_qa.FinalQATests.test_telegram_mismatched_chat_does_not_read_or_approve) ... ok
+
+======================================================================
+FAIL: test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[1, True])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>\tests\test_final_qa.py", line 13, in test_allowlist_validates_before_deduplication
+    with self.subTest(ids=ids), self.assertRaises(ValueError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[1, 1.0])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>\tests\test_final_qa.py", line 13, in test_allowlist_validates_before_deduplication
+    with self.subTest(ids=ids), self.assertRaises(ValueError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_allowlist_validates_before_deduplication (test_final_qa.FinalQATests.test_allowlist_validates_before_deduplication) (ids=[123, 123.0])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>\tests\test_final_qa.py", line 13, in test_allowlist_validates_before_deduplication
+    with self.subTest(ids=ids), self.assertRaises(ValueError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.029s
+
+FAILED (failures=3)

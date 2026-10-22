@@ -46,11 +46,12 @@ class TelegramClient:
 
 class TelegramAdapter:
     def __init__(self, orchestrator, allowed_user_ids, client):
-        ids = frozenset(allowed_user_ids)
+        ids = tuple(allowed_user_ids)
+        # Validate before deduplication: True == 1 and 1.0 == 1 in Python.
         if not ids or any(type(i) is not int or i <= 0 for i in ids):
             raise ValueError("A nonempty allowlist of positive integer user IDs is required")
         self.orchestrator = orchestrator
-        self.allowed_user_ids = ids
+        self.allowed_user_ids = frozenset(ids)
         self.client = client
         self.offset = None
 
