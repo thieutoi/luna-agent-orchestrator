@@ -30,7 +30,7 @@ class ValidationTests(unittest.TestCase):
         self.o.approve(t.id)
         self.o.execute(t.id)
         self.assertEqual(self.calls, ["private"])
-        self.assertEqual(self.o.audit, [f"{t.id}:submitted", f"{t.id}:approved", f"{t.id}:completed"])
+        self.assertEqual(self.o.audit, [f"{t.id}:submitted", f"{t.id}:approved", f"{t.id}:started", f"{t.id}:completed"])
 
     def test_completed_cannot_run_again(self):
         t = self.o.submit("echo", "x")
