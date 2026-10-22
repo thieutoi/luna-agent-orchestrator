@@ -92,6 +92,6 @@ test_result_conversion_failure_recorded (test_validation.ValidationTests.test_re
 test_sensitive_gate_has_no_side_effects (test_validation.ValidationTests.test_sensitive_gate_has_no_side_effects) ... ok
 
 ----------------------------------------------------------------------
-Ran 87 tests in 15.579s
+Ran 87 tests in 15.006s
 
 OK

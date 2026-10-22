@@ -198,7 +198,7 @@ class V030Tests(unittest.TestCase):
         self.assertNotIn("token", " ".join(prompts).lower())
         loaded = load_config(config, environ={})
         self.assertEqual(loaded["allowed_user_ids"], [123])
-        self.assertEqual(loaded["db_path"], str(self.root / "tasks.sqlite3"))
+        self.assertEqual(loaded["db_path"], str((self.root / "tasks.sqlite3").resolve()))
         with self.assertRaises(ValueError):
             configure(config, ask=ask)
 
