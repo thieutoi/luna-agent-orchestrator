@@ -1,0 +1,6 @@
+{
+  "commits": 14,
+  "unique_blobs": 37,
+  "findings": [],
+  "scope": "reachable Git file contents; excludes commit author metadata and external GitHub secrets"
+}

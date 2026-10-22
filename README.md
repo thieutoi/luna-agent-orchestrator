@@ -70,7 +70,7 @@ reading a long-lived instance after another instance changes the database.
 SQLite uses parameterized queries and conditional updates to claim each task.
 A schema version prevents silently opening a newer unsupported database.
 
-Retry accepts 0–10 additional attempts, runs immediately for handler exceptions
+Retry accepts 0â€“10 additional attempts, runs immediately for handler exceptions
 (including result conversion errors), and holds the task in `running` throughout.
 There is no delay, backoff, timeout or scheduler. Use retry only for idempotent
 handlers: side effects can happen before an exception. A sensitive task's approval
@@ -123,3 +123,15 @@ approval/rejection state guards reject repeated decisions. Delivery is not
 transactional with Telegram replies, so a decision may succeed even if its reply
 fails. Transport/API failures stop the adapter with a sanitized error; an operator
 may restart it. No live bot is automatically started by the demo or unit tests.
+
+
+## Final QA / review gate
+
+The GitHub Actions workflow tests Python 3.10, 3.11 and 3.12 on Ubuntu and Windows,
+including compile, unit/regression tests and the local demo.
+
+**Handler execution timeout is not implemented.** A blocked handler stays running;
+retries start only after an exception. SQLite connection timeouts, Telegram HTTP
+timeouts and the CI job timeout do not cancel an Agent handler. PR #2 remains Draft
+until the required timeout behavior is implemented and verified. See
+[final QA evidence](validation/FINAL_QA.vi.md) for the tested commit and CI results.
