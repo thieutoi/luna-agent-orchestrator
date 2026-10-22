@@ -1,0 +1,44 @@
+test_failure_recorded (test_core.OrchestratorTests.test_failure_recorded) ... ok
+test_normal_task (test_core.OrchestratorTests.test_normal_task) ... ok
+test_sensitive_task_needs_approval (test_core.OrchestratorTests.test_sensitive_task_needs_approval) ... ok
+test_unknown_worker (test_core.OrchestratorTests.test_unknown_worker) ... ok
+test_completed_cannot_run_again (test_validation.ValidationTests.test_completed_cannot_run_again) ... ok
+test_concurrent_execution_blocked (test_validation.ValidationTests.test_concurrent_execution_blocked) ... FAIL
+test_failed_cannot_run_again (test_validation.ValidationTests.test_failed_cannot_run_again) ... ok
+test_invalid_and_repeated_approval (test_validation.ValidationTests.test_invalid_and_repeated_approval) ... ok
+test_invalid_registration (test_validation.ValidationTests.test_invalid_registration) ... ok
+test_missing_task (test_validation.ValidationTests.test_missing_task) ... ok
+test_missing_worker_no_task_created (test_validation.ValidationTests.test_missing_worker_no_task_created) ... ok
+test_reentrant_execution_blocked (test_validation.ValidationTests.test_reentrant_execution_blocked) ... FAIL
+test_registration_and_payload (test_validation.ValidationTests.test_registration_and_payload) ... ok
+test_result_conversion_failure_recorded (test_validation.ValidationTests.test_result_conversion_failure_recorded) ... ok
+test_sensitive_gate_has_no_side_effects (test_validation.ValidationTests.test_sensitive_gate_has_no_side_effects) ... ok
+
+======================================================================
+FAIL: test_concurrent_execution_blocked (test_validation.ValidationTests.test_concurrent_execution_blocked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>\tests\test_validation.py", line 122, in test_concurrent_execution_blocked
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_reentrant_execution_blocked (test_validation.ValidationTests.test_reentrant_execution_blocked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>\tests\test_validation.py", line 99, in test_reentrant_execution_blocked
+    self.assertEqual(self.calls, ["x"])
+AssertionError: Lists differ: ['x', 'x'] != ['x']
+
+First list contains 1 additional elements.
+First extra element 1:
+'x'
+
+- ['x', 'x']
++ ['x']
+
+----------------------------------------------------------------------
+Ran 15 tests in 5.015s
+
+FAILED (failures=2)
